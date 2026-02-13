@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support | Halo</title>
+    <meta name="description" content="Get help with Halo. Contact our support team for any questions or issues.">
+    <link rel="icon" type="image/png" href="./assets/logo/halo_logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #F5F7FA;
+            --accent: #0099CC;
+            --accent-2: #7C3AED;
+            --accent-3: #00ACC1;
+            --border: rgba(0, 0, 0, 0.06);
+            --border-hover: rgba(0, 0, 0, 0.10);
+            --card-bg: rgba(255, 255, 255, 0.7);
+            --card-bg-hover: rgba(255, 255, 255, 0.95);
+            --text-p: #4A5568;
+            --text-s: #1A2138;
+            --gradient-1: linear-gradient(135deg, #00C8FF, #00ACC1, #7C3AED);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg);
+            color: #1A2138;
+            line-height: 1.7;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.015'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .ambient-bg {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -2; overflow: hidden;
+        }
+        .orb {
+            position: absolute; border-radius: 50%;
+            filter: blur(140px); opacity: 0.1;
+            animation: orbFloat 20s ease-in-out infinite;
+        }
+        .orb-1 { width: 500px; height: 500px; background: #7C3AED; top: -10%; left: 20%; }
+        .orb-2 { width: 400px; height: 400px; background: #00C8FF; bottom: 10%; right: -5%; animation-delay: -10s; }
+
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-20px, 30px) scale(0.95); }
+        }
+
+        .grid-overlay {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; z-index: -1;
+            background-image:
+                linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+            background-size: 80px 80px;
+            mask-image: radial-gradient(ellipse at 50% 30%, black 10%, transparent 60%);
+            -webkit-mask-image: radial-gradient(ellipse at 50% 30%, black 10%, transparent 60%);
+        }
+
+        /* --- Nav --- */
+        nav {
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+            padding: 1rem 0;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border);
+            transition: all 0.4s ease;
+        }
+        nav.scrolled { padding: 0.7rem 0; background: rgba(255, 255, 255, 0.85); box-shadow: 0 1px 20px rgba(0,0,0,0.04); }
+        .nav-inner {
+            max-width: 1280px; margin: 0 auto;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 2rem;
+        }
+        .logo {
+            display: flex; align-items: center; gap: 0.75rem;
+            text-decoration: none; color: #1A2138;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700; font-size: 1.4rem;
+        }
+        .logo img { width: 34px; height: 34px; object-fit: contain; filter: drop-shadow(0 0 8px rgba(0,153,204,0.2)); }
+        .nav-links { display: flex; gap: 2rem; list-style: none; align-items: center; }
+        .nav-links a { color: var(--text-p); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color 0.3s ease; }
+        .nav-links a:hover { color: #1A2138; }
+        .nav-cta {
+            padding: 0.55rem 1.4rem; border-radius: 10px;
+            font-weight: 600; font-size: 0.82rem; text-decoration: none;
+            background: var(--gradient-1); color: #fff;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 16px rgba(0,153,204,0.2);
+        }
+        .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 4px 25px rgba(0,153,204,0.3); }
+        .mobile-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; }
+        .mobile-toggle span { width: 22px; height: 2px; background: #1A2138; border-radius: 2px; transition: all 0.3s ease; }
+
+        /* --- Page Header --- */
+        .page-header {
+            padding: 10rem 2rem 4rem; text-align: center;
+            position: relative;
+        }
+        .page-header::after {
+            content: '';
+            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 60%; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-hover), transparent);
+        }
+        .page-header h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2.2rem, 5vw, 3.2rem);
+            font-weight: 700; letter-spacing: -0.03em;
+            margin-bottom: 0.8rem;
+        }
+        .page-header h1 .gradient-text {
+            background: var(--gradient-1);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .page-header p { color: var(--text-p); font-size: 1.05rem; max-width: 550px; margin: 0 auto; }
+
+        /* --- Content --- */
+        .content-wrapper {
+            max-width: 900px; margin: 0 auto;
+            padding: 4rem 2rem 6rem;
+        }
+
+        /* --- Contact Card --- */
+        .contact-hero {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        .contact-hero-card {
+            display: inline-flex; flex-direction: column;
+            align-items: center;
+            padding: 3rem 4rem;
+            border-radius: 28px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            transition: all 0.4s ease;
+        }
+        .contact-hero-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.06);
+        }
+        .contact-icon {
+            width: 64px; height: 64px;
+            border-radius: 20px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, rgba(0,153,204,0.06), rgba(124,58,237,0.06));
+        }
+        .contact-icon svg { width: 28px; height: 28px; color: var(--accent); stroke-width: 1.8; }
+        .contact-hero-card h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.3rem; font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .contact-hero-card p { color: var(--text-p); font-size: 0.92rem; margin-bottom: 1.5rem; }
+        .email-link {
+            display: inline-flex; align-items: center; gap: 0.6rem;
+            padding: 0.8rem 1.8rem;
+            border-radius: 14px;
+            background: rgba(0, 153, 204, 0.06);
+            border: 1px solid rgba(0, 153, 204, 0.12);
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        .email-link:hover {
+            background: rgba(0, 153, 204, 0.1);
+            border-color: rgba(0, 153, 204, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,153,204,0.1);
+        }
+        .email-link svg { width: 18px; height: 18px; stroke-width: 2; }
+
+        /* --- Quick Help Cards --- */
+        .help-section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem; font-weight: 600;
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #1A2138;
+        }
+        .help-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.2rem;
+            margin-bottom: 4rem;
+        }
+        .help-card {
+            padding: 2rem;
+            border-radius: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            transition: all 0.4s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .help-card:hover {
+            border-color: var(--border-hover);
+            background: var(--card-bg-hover);
+            transform: translateY(-3px);
+        }
+        .help-card-icon {
+            width: 44px; height: 44px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 1.2rem;
+            background: linear-gradient(135deg, rgba(0,153,204,0.05), rgba(124,58,237,0.05));
+        }
+        .help-card-icon svg { width: 20px; height: 20px; color: var(--accent); stroke-width: 1.8; }
+        .help-card h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.05rem; font-weight: 600;
+            margin-bottom: 0.5rem; color: #1A2138;
+        }
+        .help-card p { color: var(--text-p); font-size: 0.85rem; line-height: 1.6; }
+
+        /* --- Common Issues --- */
+        .issues-section {
+            padding: 2.5rem;
+            border-radius: 24px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            margin-bottom: 3rem;
+        }
+        .issues-section h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.3rem; font-weight: 600;
+            margin-bottom: 1.5rem; color: #1A2138;
+        }
+        .issue-item {
+            padding: 1.2rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .issue-item:last-child { border-bottom: none; }
+        .issue-item h4 {
+            font-size: 0.95rem; font-weight: 600;
+            color: var(--text-s);
+            margin-bottom: 0.4rem;
+        }
+        .issue-item p { color: var(--text-p); font-size: 0.88rem; }
+        .issue-item a { color: var(--accent); text-decoration: none; }
+        .issue-item a:hover { text-decoration: underline; }
+
+        /* --- Response Time --- */
+        .response-note {
+            text-align: center;
+            padding: 2rem;
+            border-radius: 20px;
+            background: rgba(124, 58, 237, 0.05);
+            border: 1px solid rgba(124, 58, 237, 0.1);
+        }
+        .response-note p {
+            color: var(--text-p);
+            font-size: 0.9rem;
+        }
+        .response-note strong { color: #0099CC; }
+
+        /* --- Footer --- */
+        footer {
+            padding: 5rem 2rem 3rem;
+            border-top: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.8);
+        }
+        .footer-inner {
+            max-width: 1280px; margin: 0 auto;
+            display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr;
+            gap: 4rem;
+        }
+        .footer-brand p { margin-top: 1rem; color: var(--text-p); font-size: 0.88rem; line-height: 1.7; max-width: 280px; }
+        .footer-col h4 { margin-bottom: 1.5rem; color: #1A2138; font-family: 'Space Grotesk', sans-serif; font-size: 0.85rem; font-weight: 600; }
+        .footer-col ul { list-style: none; }
+        .footer-col li { margin-bottom: 0.8rem; }
+        .footer-col a { color: var(--text-p); text-decoration: none; font-size: 0.88rem; transition: color 0.3s ease; }
+        .footer-col a:hover { color: var(--accent); }
+        .footer-bottom {
+            max-width: 1280px; margin: 4rem auto 0;
+            padding-top: 2rem; border-top: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .footer-bottom p { color: #94a3b8; font-size: 0.78rem; }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .mobile-toggle { display: flex; }
+            .nav-links.open {
+                display: flex; flex-direction: column;
+                position: absolute; top: 100%; left: 0; right: 0;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(20px);
+                padding: 2rem; gap: 1.5rem;
+                border-bottom: 1px solid var(--border);
+                box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+            }
+            .help-grid { grid-template-columns: 1fr; }
+            .footer-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+            .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; }
+            .contact-hero-card { padding: 2.5rem 2rem; }
+            .content-wrapper { padding: 3rem 1.5rem 5rem; }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .page-header h1 { animation: fadeInUp 0.8s ease forwards; animation-delay: 0.1s; opacity: 0; }
+        .page-header p { animation: fadeInUp 0.8s ease forwards; animation-delay: 0.25s; opacity: 0; }
+
+        .reveal {
+            opacity: 0; transform: translateY(30px);
+            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+    <div class="grid-overlay"></div>
+
+    <!-- Nav -->
+    <nav id="navbar">
+        <div class="nav-inner">
+            <a href="./index.html" class="logo">
+                <img src="./assets/logo/halo_logo.png" alt="Halo Logo">
+                Halo
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="./index.html#features">Features</a></li>
+                <li><a href="./index.html#how-it-works">How It Works</a></li>
+                <li><a href="./user-guide.html">User Guide</a></li>
+                <li><a href="./support.html">Support</a></li>
+            </ul>
+            <a href="./index.html#download" class="nav-cta">Get Halo</a>
+            <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>How Can We <span class="gradient-text">Help?</span></h1>
+        <p>We're here to make sure your safety net works flawlessly. Reach out anytime.</p>
+    </div>
+
+    <!-- Content -->
+    <div class="content-wrapper">
+
+        <!-- Contact Card -->
+        <div class="contact-hero reveal">
+            <div class="contact-hero-card">
+                <div class="contact-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                </div>
+                <h2>Email Us Directly</h2>
+                <p>For questions, feedback, bug reports, or account issues.</p>
+                <a href="mailto:halo.app.official@gmail.com" class="email-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    halo.app.official@gmail.com
+                </a>
+            </div>
+        </div>
+
+        <!-- Quick Help -->
+        <h2 class="help-section-title reveal">Quick Help</h2>
+        <div class="help-grid">
+            <a href="./user-guide.html" class="help-card reveal">
+                <div class="help-card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                </div>
+                <h3>User Guide</h3>
+                <p>Learn how every feature works, from check-ins to your Arch Network.</p>
+            </a>
+            <a href="./user-guide.html#faq" class="help-card reveal">
+                <div class="help-card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                </div>
+                <h3>FAQ</h3>
+                <p>Quick answers to common questions about Halo and your safety.</p>
+            </a>
+            <a href="./privacy-policy.html" class="help-card reveal">
+                <div class="help-card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <h3>Privacy Policy</h3>
+                <p>Understand how we handle your data — no location tracking, ever.</p>
+            </a>
+        </div>
+
+        <!-- Common Issues -->
+        <div class="issues-section reveal">
+            <h2>Common Issues</h2>
+
+            <div class="issue-item">
+                <h4>My Arch didn't receive a notification</h4>
+                <p>Ensure your Arch has accepted your invitation first (check the Archs tab). Ask them to allow "Notifications" for <b>Halo</b> in their phone settings.</p>
+            </div>
+
+            <div class="issue-item">
+                <h4>I accidentally triggered an alert</h4>
+                <p>Open Halo immediately and enter your PIN to restore Halo Green. The app will prompt you to reassure your Archs with a message.</p>
+            </div>
+
+            <div class="issue-item">
+                <h4>I want to delete my account</h4>
+                <p>You can delete your account at any time from the app Settings. This permanently erases all your data and Arch connections from our servers.</p>
+            </div>
+
+            <div class="issue-item">
+                <h4>Notifications are delayed or not showing</h4>
+                <p>Check that battery optimization is disabled for Halo, and that the app is allowed to run in the background. On Android, also check "Unrestricted" battery settings for Halo.</p>
+            </div>
+
+            <div class="issue-item">
+                <h4>Something else?</h4>
+                <p>Email us at <a href="mailto:halo.app.official@gmail.com">halo.app.official@gmail.com</a>. We'll get back to you as soon as possible.</p>
+            </div>
+        </div>
+
+        <!-- Response Time -->
+        <div class="response-note reveal">
+            <p>We typically respond within <strong>24–48 hours</strong>. For urgent safety concerns, please contact your local emergency services immediately.</p>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-inner">
+            <div class="footer-col footer-brand">
+                <a href="./index.html" class="logo">
+                    <img src="./assets/logo/halo_logo.png" alt="Logo"> Halo
+                </a>
+                <p>Your automated safety net. Protection that speaks when you can't.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="./index.html#features">Features</a></li>
+                    <li><a href="./index.html#how-it-works">How It Works</a></li>
+                    <li><a href="./index.html#screenshots">App Preview</a></li>
+                    <li><a href="./index.html#who-its-for">Audience</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="./user-guide.html">User Guide & FAQ</a></li>
+                    <li><a href="./support.html">Support</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="./privacy-policy.html">Privacy Policy</a></li>
+                    <li><a href="./terms-of-service.html">Terms of Service</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Halo. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        window.addEventListener('scroll', () => { document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50); });
+        document.getElementById('mobileToggle').addEventListener('click', () => { document.getElementById('navLinks').classList.toggle('open'); });
+        document.querySelectorAll('#navLinks a').forEach(link => { link.addEventListener('click', () => { document.getElementById('navLinks').classList.remove('open'); }); });
+    </script>
+</body>
+</html>

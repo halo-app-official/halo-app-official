@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halo | Your Automated Safety Net</title>
+    <meta name="description" content="Proactive protection that speaks when you can't. Turn your trusted relationships into an automated safety net with Halo.">
+    <link rel="icon" type="image/png" href="./assets/logo/halo_logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #F5F7FA;
+            --bg-2: #FFFFFF;
+            --accent: #0099CC;
+            --accent-2: #7C3AED;
+            --accent-3: #00ACC1;
+            --accent-soft: rgba(0, 153, 204, 0.06);
+            --accent-glow: rgba(0, 153, 204, 0.15);
+            --border: rgba(0, 0, 0, 0.06);
+            --border-hover: rgba(0, 0, 0, 0.10);
+            --card-bg: rgba(255, 255, 255, 0.7);
+            --card-bg-hover: rgba(255, 255, 255, 0.95);
+            --glass: rgba(255, 255, 255, 0.6);
+            --text-p: #4A5568;
+            --text-s: #1A2138;
+            --gradient-1: linear-gradient(135deg, #00C8FF, #00ACC1, #7C3AED);
+            --gradient-2: linear-gradient(135deg, #7C3AED, #00ACC1, #00C8FF);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg);
+            color: #1A2138;
+            line-height: 1.7;
+            letter-spacing: -0.01em;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* --- Noise Texture Overlay --- */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.015'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* --- Ambient Background Orbs --- */
+        .ambient-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(140px);
+            opacity: 0.12;
+            animation: orbFloat 20s ease-in-out infinite;
+        }
+        .orb-1 { width: 600px; height: 600px; background: #7C3AED; top: -10%; left: -10%; animation-delay: 0s; }
+        .orb-2 { width: 500px; height: 500px; background: #00C8FF; top: 30%; right: -15%; animation-delay: -7s; }
+        .orb-3 { width: 400px; height: 400px; background: #00ACC1; bottom: -5%; left: 20%; animation-delay: -14s; }
+        .orb-4 { width: 350px; height: 350px; background: #7C3AED; bottom: 20%; right: 10%; animation-delay: -3s; opacity: 0.08; }
+
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(40px, -30px) scale(1.05); }
+            50% { transform: translate(-20px, 40px) scale(0.95); }
+            75% { transform: translate(30px, 20px) scale(1.02); }
+        }
+
+        /* --- Grid Overlay --- */
+        .grid-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background-image:
+                linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+            background-size: 80px 80px;
+            mask-image: radial-gradient(ellipse at 50% 50%, black 20%, transparent 70%);
+            -webkit-mask-image: radial-gradient(ellipse at 50% 50%, black 20%, transparent 70%);
+        }
+
+        /* --- Scroll Reveal --- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reveal-delay-1 { transition-delay: 0.1s; }
+        .reveal-delay-2 { transition-delay: 0.2s; }
+        .reveal-delay-3 { transition-delay: 0.3s; }
+        .reveal-delay-4 { transition-delay: 0.4s; }
+        .reveal-delay-5 { transition-delay: 0.5s; }
+
+        /* --- Navigation --- */
+        nav {
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+            padding: 1rem 0;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border);
+            transition: all 0.4s ease;
+        }
+        nav.scrolled {
+            padding: 0.7rem 0;
+            background: rgba(255, 255, 255, 0.85);
+            border-bottom-color: rgba(0,0,0,0.08);
+            box-shadow: 0 1px 20px rgba(0,0,0,0.04);
+        }
+        .nav-inner {
+            max-width: 1280px; margin: 0 auto;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 2rem;
+        }
+        .logo {
+            display: flex; align-items: center; gap: 0.75rem;
+            text-decoration: none; color: #1A2138;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700; font-size: 1.4rem;
+            letter-spacing: -0.03em;
+        }
+        .logo img {
+            width: 34px; height: 34px; object-fit: contain;
+            filter: drop-shadow(0 0 8px rgba(0,153,204,0.2));
+        }
+        .nav-links { display: flex; gap: 2rem; list-style: none; align-items: center; }
+        .nav-links a {
+            color: var(--text-p); text-decoration: none;
+            font-size: 0.85rem; font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px; left: 0;
+            width: 0; height: 1.5px;
+            background: var(--gradient-1);
+            transition: width 0.3s ease;
+        }
+        .nav-links a:hover { color: #1A2138; }
+        .nav-links a:hover::after { width: 100%; }
+
+        .nav-cta {
+            padding: 0.55rem 1.4rem;
+            border-radius: 10px;
+            font-weight: 600; font-size: 0.82rem;
+            text-decoration: none;
+            background: var(--gradient-1);
+            color: #fff;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 16px rgba(0,153,204,0.2);
+        }
+        .nav-cta:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 25px rgba(0,153,204,0.3);
+        }
+
+        /* --- Mobile Menu --- */
+        .mobile-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 4px;
+        }
+        .mobile-toggle span {
+            width: 22px; height: 2px;
+            background: #1A2138;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        /* --- Hero --- */
+        .hero {
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            text-align: center;
+            padding: 8rem 1.5rem 6rem;
+            position: relative;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-hover), transparent);
+        }
+
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: rgba(0, 153, 204, 0.08);
+            border: 1px solid rgba(0, 153, 204, 0.15);
+            color: #0099CC;
+            padding: 0.5rem 1.3rem;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 2.5rem;
+            backdrop-filter: blur(10px);
+        }
+        .hero-badge-dot {
+            width: 6px; height: 6px;
+            background: #0099CC;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.5); }
+        }
+
+        .hero h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(3rem, 8vw, 5.5rem);
+            line-height: 1.0;
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            margin-bottom: 1.8rem;
+            max-width: 900px;
+        }
+        .hero h1 .gradient-text {
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero p {
+            max-width: 600px;
+            color: var(--text-p);
+            font-size: 1.15rem;
+            margin-bottom: 3rem;
+            line-height: 1.8;
+        }
+        .hero-actions {
+            display: flex; gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.9rem 2.2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+            border: none;
+            font-size: 0.95rem;
+            font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-primary {
+            background: var(--gradient-1);
+            color: #fff;
+            box-shadow: 0 2px 20px rgba(0,153,204,0.2);
+        }
+        .btn-primary:hover {
+            background: var(--gradient-1);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 40px rgba(0,153,204,0.3);
+        }
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-s);
+            border: 1px solid var(--border-hover);
+        }
+        .btn-ghost:hover {
+            border-color: rgba(0,0,0,0.2);
+            background: rgba(0,0,0,0.03);
+            transform: translateY(-2px);
+        }
+        .btn-arrow {
+            transition: transform 0.3s ease;
+            font-size: 1.1rem;
+        }
+        .btn:hover .btn-arrow { transform: translateX(3px); }
+
+        /* --- Floating Stats --- */
+        .hero-stats {
+            display: flex; gap: 3rem;
+            margin-top: 5rem;
+            padding: 2rem 3rem;
+            border-radius: 20px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+        }
+        .stat { text-align: center; }
+        .stat-num {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem; font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stat-label {
+            font-size: 0.78rem;
+            color: var(--text-p);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-top: 0.25rem;
+        }
+
+        /* --- Section Layout --- */
+        .section {
+            max-width: 1280px; margin: 0 auto;
+            padding: 8rem 2rem;
+            position: relative;
+        }
+        .section-divider {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-hover), transparent);
+            margin: 0 auto;
+            max-width: 1280px;
+        }
+
+        .title-group { text-align: center; margin-bottom: 5rem; }
+        .title-label {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 1.2rem;
+        }
+        .title-label::before, .title-label::after {
+            content: '';
+            width: 20px; height: 1px;
+            background: var(--accent);
+            opacity: 0.4;
+        }
+        .title-group h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2.2rem, 5vw, 3.2rem);
+            letter-spacing: -0.03em;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #1A2138;
+        }
+        .title-group > p {
+            max-width: 550px;
+            margin: 0 auto;
+            color: var(--text-p);
+            font-size: 1.05rem;
+        }
+
+        /* --- Bento Features --- */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.2rem;
+        }
+        .bento-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 2.2rem;
+            display: flex; flex-direction: column;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .bento-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 24px;
+            padding: 1px;
+            background: linear-gradient(135deg, transparent 40%, rgba(0,153,204,0.12), transparent 60%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .bento-card:hover::before { opacity: 1; }
+        .bento-card:hover {
+            border-color: rgba(0,0,0,0.08);
+            background: var(--card-bg-hover);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+        }
+        .bento-card .card-glow {
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 200px; height: 200px;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+        .bento-card:hover .card-glow { opacity: 0.15; }
+
+        .icon-wrap {
+            width: 48px; height: 48px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+        .icon-wrap::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 14px;
+            background: var(--gradient-1);
+            opacity: 0.1;
+        }
+        .icon-svg {
+            width: 22px; height: 22px;
+            color: var(--accent);
+            stroke-width: 1.8;
+        }
+
+        .bento-card h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.25rem; margin-bottom: 0.7rem;
+            font-weight: 600; letter-spacing: -0.02em;
+            color: #1A2138;
+        }
+        .bento-card p { color: var(--text-p); font-size: 0.9rem; line-height: 1.7; }
+
+        .f-wide { grid-column: span 2; }
+        .f-tall { grid-row: span 2; justify-content: space-between; }
+
+        .f-wide .bento-inner { display: flex; align-items: flex-start; gap: 2rem; }
+        .f-wide .bento-inner .icon-wrap { flex-shrink: 0; }
+        .f-tall p { font-size: 0.92rem; }
+
+        /* --- Steps / How it works --- */
+        .steps-container {
+            max-width: 750px; margin: 0 auto;
+            position: relative;
+        }
+        .steps-container::before {
+            content: '';
+            position: absolute;
+            left: 28px; top: 0; bottom: 0;
+            width: 1px;
+            background: linear-gradient(180deg, transparent, var(--accent), var(--accent-2), transparent);
+            opacity: 0.2;
+        }
+        .step {
+            display: flex; gap: 2.5rem;
+            margin-bottom: 4rem;
+            position: relative;
+            align-items: flex-start;
+        }
+        .step:last-child { margin-bottom: 0; }
+        .step-indicator {
+            width: 56px; height: 56px;
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem; font-weight: 700;
+            flex-shrink: 0;
+            background: rgba(0, 153, 204, 0.08);
+            border: 1px solid rgba(0, 153, 204, 0.15);
+            color: #0099CC;
+            position: relative;
+            z-index: 1;
+        }
+        .step-content h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.4rem; margin-bottom: 0.6rem;
+            font-weight: 600; color: #1A2138;
+        }
+        .step-content p { font-size: 1rem; color: var(--text-p); line-height: 1.7; }
+
+        /* --- Screenshots (ENHANCED CAROUSEL) --- */
+        .shots-section {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shots-carousel {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 580px;
+            perspective: 1200px;
+            padding: 2rem 0 3rem;
+        }
+
+        .shots-track {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .shot-card {
+            position: absolute;
+            width: 280px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            padding: 1.2rem;
+            text-align: center;
+            transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .shot-card .phone-frame {
+            background: linear-gradient(135deg, rgba(124,58,237,0.06), rgba(0,172,193,0.06));
+            border-radius: 24px;
+            padding: 0.4rem;
+            margin-bottom: 1.2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shot-card .phone-frame::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 24px;
+            background: linear-gradient(135deg, rgba(0,153,204,0.1), rgba(124,58,237,0.1));
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .shot-card.active .phone-frame::before { opacity: 1; }
+
+        .shot-card img {
+            width: 100%;
+            border-radius: 20px;
+            display: block;
+            transition: transform 0.5s ease;
+        }
+
+        .shot-card h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.05rem;
+            margin-bottom: 0.4rem;
+            font-weight: 600;
+            color: #1A2138;
+            transition: all 0.4s ease;
+        }
+        .shot-card p {
+            color: var(--text-p);
+            font-size: 0.82rem;
+            line-height: 1.6;
+            transition: all 0.4s ease;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            margin: 0;
+        }
+
+        /* Active center card */
+        .shot-card.active {
+            z-index: 10;
+            transform: translateX(0) scale(1) rotateY(0deg);
+            box-shadow: 0 25px 60px rgba(0,153,204,0.15), 0 0 0 1px rgba(0,153,204,0.1);
+            border-color: rgba(0,153,204,0.2);
+        }
+        .shot-card.active p {
+            max-height: 60px;
+            opacity: 1;
+            margin-top: 0.2rem;
+        }
+        .shot-card.active h3 {
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Side cards */
+        .shot-card.prev {
+            z-index: 5;
+            transform: translateX(-320px) scale(0.85) rotateY(8deg);
+            opacity: 0.7;
+            filter: blur(1px);
+        }
+        .shot-card.next {
+            z-index: 5;
+            transform: translateX(320px) scale(0.85) rotateY(-8deg);
+            opacity: 0.7;
+            filter: blur(1px);
+        }
+
+        /* Far side cards */
+        .shot-card.far-prev {
+            z-index: 2;
+            transform: translateX(-580px) scale(0.7) rotateY(12deg);
+            opacity: 0.3;
+            filter: blur(3px);
+        }
+        .shot-card.far-next {
+            z-index: 2;
+            transform: translateX(580px) scale(0.7) rotateY(-12deg);
+            opacity: 0.3;
+            filter: blur(3px);
+        }
+
+        /* Hidden cards */
+        .shot-card.hidden-card {
+            z-index: 0;
+            opacity: 0;
+            transform: scale(0.5);
+            pointer-events: none;
+        }
+
+        /* Navigation arrows */
+        .shot-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.9);
+            border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            z-index: 20;
+            transition: all 0.3s ease;
+            color: var(--text-s);
+            font-size: 1.2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        .shot-nav:hover {
+            background: #fff;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            transform: translateY(-50%) scale(1.08);
+        }
+        .shot-nav-prev { left: max(2rem, calc(50% - 400px)); }
+        .shot-nav-next { right: max(2rem, calc(50% - 400px)); }
+
+        /* Dots indicator */
+        .shots-dots {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem 0 0;
+        }
+        .shots-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.12);
+            border: none;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            padding: 0;
+        }
+        .shots-dot.active {
+            width: 28px;
+            border-radius: 4px;
+            background: var(--gradient-1);
+        }
+
+      /* --- Audience / Who Is It For (ENHANCED) --- */
+.audience-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+}
+
+.audience-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    overflow: hidden;
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.audience-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 24px;
+    padding: 1px;
+    background: linear-gradient(135deg, transparent 30%, rgba(0,153,204,0.2), rgba(124,58,237,0.15), transparent 70%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.audience-card:hover::before { opacity: 1; }
+
+/* The Image Container */
+.audience-img-wrapper {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+}
+
+.audience-img-wrapper::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 60%;
+    background: linear-gradient(to top, rgba(0,0,0,0.25), transparent);
+    z-index: 1;
+    transition: opacity 0.5s ease;
+    opacity: 0.6;
+}
+
+.audience-card:hover .audience-img-wrapper::after {
+    opacity: 0.3;
+}
+
+.audience-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.5s ease;
+    filter: brightness(0.95) saturate(1.1);
+}
+
+.audience-card:hover .audience-img-wrapper img {
+    transform: scale(1.12);
+    filter: brightness(1.05) saturate(1.2);
+}
+
+/* The Text Content */
+.audience-content {
+    padding: 1.5rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.audience-card h4 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.15rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+    color: #1A2138;
+    transition: color 0.3s ease;
+}
+
+.audience-card:hover h4 {
+    background: var(--gradient-1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.audience-card p {
+    color: var(--text-p);
+    font-size: 0.88rem;
+    line-height: 1.6;
+}
+
+/* --- ANIMATION: Hover Effects --- */
+.audience-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 153, 204, 0.1);
+    border-color: rgba(0, 153, 204, 0.15);
+}
+
+/* Stagger animation for scroll reveal */
+.audience-card.reveal {
+    opacity: 0;
+    transform: translateY(50px) scale(0.95);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.audience-card.reveal.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+.audience-card.reveal.reveal-delay-1 { transition-delay: 0.1s; }
+.audience-card.reveal.reveal-delay-2 { transition-delay: 0.2s; }
+.audience-card.reveal.reveal-delay-3 { transition-delay: 0.3s; }
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .audience-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+    .audience-grid { grid-template-columns: 1fr; }
+    .audience-img-wrapper { height: 220px; }
+}
+        /* --- CTA Banner --- */
+        .cta-section {
+            max-width: 1280px; margin: 0 auto;
+            padding: 0 2rem 8rem;
+        }
+        .cta-banner {
+            position: relative;
+            border-radius: 32px;
+            padding: 5rem 3rem;
+            text-align: center;
+            overflow: hidden;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+        }
+        .cta-banner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 0%, rgba(124,58,237,0.08) 0%, transparent 60%),
+                        radial-gradient(circle at 50% 100%, rgba(0,153,204,0.06) 0%, transparent 60%);
+        }
+        .cta-banner > * { position: relative; z-index: 1; }
+        .cta-banner h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2rem, 4vw, 2.8rem);
+            font-weight: 700; margin-bottom: 1rem;
+            letter-spacing: -0.03em;
+            color: #1A2138;
+        }
+        .cta-banner p {
+            color: var(--text-p);
+            max-width: 500px; margin: 0 auto 2.5rem;
+            font-size: 1.05rem;
+        }
+
+        /* --- Footer --- */
+        footer {
+            padding: 5rem 2rem 3rem;
+            border-top: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.8);
+        }
+        .footer-inner {
+            max-width: 1280px; margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr 1fr;
+            gap: 4rem;
+        }
+        .footer-brand p {
+            margin-top: 1rem;
+            color: var(--text-p);
+            font-size: 0.88rem;
+            line-height: 1.7;
+            max-width: 280px;
+        }
+        .footer-col h4 {
+            margin-bottom: 1.5rem;
+            color: #1A2138;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+        }
+        .footer-col ul { list-style: none; }
+        .footer-col li { margin-bottom: 0.8rem; }
+        .footer-col a {
+            color: var(--text-p); text-decoration: none;
+            font-size: 0.88rem;
+            transition: color 0.3s ease;
+        }
+        .footer-col a:hover { color: var(--accent); }
+        .footer-bottom {
+            max-width: 1280px; margin: 4rem auto 0;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .footer-bottom p { color: #94a3b8; font-size: 0.78rem; }
+        .footer-social {
+            display: flex; gap: 1rem;
+        }
+        .footer-social a {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-p);
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .footer-social a:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(0,153,204,0.05);
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 1024px) {
+            .bento-grid { grid-template-columns: repeat(2, 1fr); }
+            .f-wide { grid-column: span 2; }
+            .f-tall { grid-row: span 1; }
+            .audience-grid { grid-template-columns: repeat(2, 1fr); }
+            .shots-carousel { min-height: 520px; }
+            .shot-card.prev { transform: translateX(-280px) scale(0.85) rotateY(8deg); }
+            .shot-card.next { transform: translateX(280px) scale(0.85) rotateY(-8deg); }
+            .shot-card.far-prev { transform: translateX(-480px) scale(0.7) rotateY(12deg); }
+            .shot-card.far-next { transform: translateX(480px) scale(0.7) rotateY(-12deg); }
+            .footer-inner { grid-template-columns: repeat(2, 1fr); gap: 3rem; }
+            .hero h1 { font-size: clamp(2.5rem, 6vw, 4rem); }
+            .hero-stats { gap: 2rem; padding: 1.5rem 2rem; }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .mobile-toggle { display: flex; }
+            .nav-links.open {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 100%; left: 0; right: 0;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(20px);
+                padding: 2rem;
+                gap: 1.5rem;
+                border-bottom: 1px solid var(--border);
+                box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+            }
+            .bento-grid { grid-template-columns: 1fr; }
+            .f-wide { grid-column: span 1; }
+            .f-wide .bento-inner { flex-direction: column; gap: 0; }
+            .audience-grid { grid-template-columns: 1fr; }
+            .shot-card { width: 240px; }
+            .shot-card.prev { transform: translateX(-200px) scale(0.8) rotateY(5deg); }
+            .shot-card.next { transform: translateX(200px) scale(0.8) rotateY(-5deg); }
+            .shot-card.far-prev, .shot-card.far-next { opacity: 0; pointer-events: none; }
+            .shots-carousel { min-height: 440px; }
+            .shot-nav { width: 40px; height: 40px; }
+            .shot-nav-prev { left: 0.3rem; }
+            .shot-nav-next { right: 0.3rem; }
+            .footer-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+            .hero-stats { flex-direction: column; gap: 1.5rem; }
+            .hero-actions { flex-direction: column; width: 100%; }
+            .hero-actions .btn { width: 100%; justify-content: center; }
+            .section { padding: 5rem 1.5rem; }
+            .steps-container::before { left: 20px; }
+            .step { gap: 1.5rem; }
+            .step-indicator { width: 42px; height: 42px; font-size: 0.9rem; border-radius: 12px; }
+            .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; }
+            .cta-banner { padding: 3.5rem 2rem; }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 { font-size: 2.4rem; }
+            .hero p { font-size: 1rem; }
+            .stat-num { font-size: 1.5rem; }
+            .title-group h2 { font-size: 2rem; }
+            .shot-card { width: 220px; }
+            .shot-card.prev { transform: translateX(-240px) scale(0.85) rotateY(6deg); }
+            .shot-card.next { transform: translateX(240px) scale(0.85) rotateY(-6deg); }
+            .shot-card.far-prev, .shot-card.far-next { opacity: 0; pointer-events: none; }
+            .shots-carousel { min-height: 480px; }
+            .shot-nav-prev { left: 0.5rem; }
+            .shot-nav-next { right: 0.5rem; }
+        }
+
+        /* --- Smooth load --- */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .hero-badge { animation: fadeInUp 0.8s ease forwards; animation-delay: 0.1s; opacity: 0; }
+        .hero h1 { animation: fadeInUp 0.8s ease forwards; animation-delay: 0.25s; opacity: 0; }
+        .hero p { animation: fadeInUp 0.8s ease forwards; animation-delay: 0.4s; opacity: 0; }
+        .hero-actions { animation: fadeInUp 0.8s ease forwards; animation-delay: 0.55s; opacity: 0; }
+        .hero-stats { animation: fadeInUp 0.8s ease forwards; animation-delay: 0.7s; opacity: 0; }
+
+        /* --- Waitlist Form --- */
+        .waitlist-form {
+            display: flex;
+            gap: 0.75rem;
+            max-width: 480px;
+            width: 100%;
+        }
+        .waitlist-form input[type="email"] {
+            flex: 1;
+            padding: 0.9rem 1.4rem;
+            border-radius: 12px;
+            border: 1.5px solid var(--border-hover);
+            background: var(--bg-2);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            color: #1A2138;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        .waitlist-form input[type="email"]::placeholder {
+            color: #94a3b8;
+        }
+        .waitlist-form input[type="email"]:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(0,153,204,0.1);
+        }
+        .waitlist-form .btn-primary {
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .waitlist-success {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            animation: fadeInUp 0.6s ease forwards;
+        }
+        .waitlist-success.show {
+            display: flex;
+        }
+        .waitlist-success .success-icon {
+            width: 52px; height: 52px;
+            border-radius: 50%;
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid rgba(16, 185, 129, 0.3);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 0.25rem;
+        }
+        .waitlist-success .success-icon svg {
+            width: 26px; height: 26px;
+            color: #10b981;
+        }
+        .waitlist-success h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1A2138;
+        }
+        .waitlist-success p {
+            color: var(--text-p);
+            font-size: 0.95rem;
+            margin: 0;
+        }
+        .waitlist-note {
+            font-size: 0.78rem;
+            color: #94a3b8;
+            margin-top: 0.5rem;
+        }
+        .waitlist-note svg {
+            width: 13px; height: 13px;
+            vertical-align: -2px;
+            margin-right: 2px;
+        }
+        .cta-waitlist-form {
+            justify-content: center;
+            margin: 0 auto;
+        }
+        @media (max-width: 768px) {
+            .waitlist-form {
+                flex-direction: column;
+                max-width: 100%;
+            }
+            .waitlist-form .btn-primary {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ambient Background -->
+    <div class="ambient-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="orb orb-4"></div>
+    </div>
+    <div class="grid-overlay"></div>
+
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-inner">
+            <a href="#" class="logo">
+                <img src="./assets/logo/halo_logo.png" alt="Halo Logo">
+                Halo
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="./user-guide.html">User Guide</a></li>
+                <li><a href="./support.html">Support</a></li>
+            </ul>
+            <a href="#waitlist" class="nav-cta">Join Waitlist</a>
+            <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-badge">
+            <span class="hero-badge-dot"></span>
+            Coming Soon
+        </div>
+        <h1>Your <span class="gradient-text">Inner Circle</span>,<br>Always With You</h1>
+        <p>Proactive protection that speaks when you can't. Turn your trusted relationships into an automated safety net with Halo.</p>
+        <div class="hero-actions">
+            <form class="waitlist-form" id="heroWaitlistForm" onsubmit="return handleWaitlist(event, 'hero')">
+                <input type="email" placeholder="Enter your email" required aria-label="Email address">
+                <button type="submit" class="btn btn-primary">Join the Waitlist <span class="btn-arrow">&rarr;</span></button>
+            </form>
+        </div>
+        <div class="waitlist-success" id="heroWaitlistSuccess">
+            <div class="success-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <h3>You're on the list!</h3>
+            <p>We'll notify you as soon as Halo launches.</p>
+        </div>
+        <p class="waitlist-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> No spam, ever. Unsubscribe anytime.</p>
+        <div style="margin-top: 0.5rem;">
+            <a href="#how-it-works" class="btn btn-ghost">Learn More</a>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- Features -->
+    <section id="features" class="section">
+        <div class="title-group reveal">
+            <div class="title-label">Features</div>
+            <h2>Why Halo?</h2>
+            <p>Unlike traditional panic buttons, Halo works automatically if you can't reach your phone.</p>
+        </div>
+        <div class="bento-grid">
+            <!-- Smart Check-ins (wide) -->
+            <div class="bento-card f-wide reveal reveal-delay-1">
+                <div class="card-glow" style="background: var(--accent);"></div>
+                <div class="bento-inner">
+                    <div class="icon-wrap">
+                        <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <div>
+                        <h3>Smart Check-ins</h3>
+                        <p>Set a timer and live your life. As long as you're safe, your status stays Halo Green. Miss a check-in? Your Arch Network gets notified instantly.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Arch Network -->
+            <div class="bento-card reveal reveal-delay-2">
+                <div class="card-glow" style="background: var(--accent-2);"></div>
+                <div class="icon-wrap">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-3-3.87"/><path d="M9 21v-2a4 4 0 0 0-3-3.87"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+                <h3>Arch Network</h3>
+                <p>Build your inner circle by inviting trusted friends and family to be your "Archs".</p>
+            </div>
+
+            <!-- False Alarm Prevention (tall) -->
+            <div class="bento-card f-tall reveal reveal-delay-3">
+                <div class="card-glow" style="background: var(--accent-3);"></div>
+                <div class="icon-wrap">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <h3>False Alarm Prevention</h3>
+                <p>Before alerting anyone, Halo enters a grace period giving you time to confirm you're safe and prevent false alarms. You stay in full control of your safety narrative.</p>
+            </div>
+
+            <!-- Silent Mode -->
+            <div class="bento-card reveal reveal-delay-1">
+                <div class="card-glow" style="background: var(--accent-2);"></div>
+                <div class="icon-wrap">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18.36 19.78A9.94 9.94 0 0 0 22 12c0-5.52-4.48-10-10-10a9.94 9.94 0 0 0-7.78 3.64"/><path d="M2 2l20 20"/><path d="M6.6 6.6A7.96 7.96 0 0 0 4 12c0 4.42 3.58 8 8 8a7.96 7.96 0 0 0 5.4-2.6"/></svg>
+                </div>
+                <h3>Silent Mode</h3>
+                <p>Temporarily disable alerts for movies or meetings. You're always in control.</p>
+            </div>
+
+            <!-- Live Watchlist (wide) -->
+            <div class="bento-card f-wide reveal reveal-delay-2">
+                <div class="card-glow" style="background: var(--accent);"></div>
+                <div class="bento-inner">
+                    <div class="icon-wrap">
+                        <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </div>
+                    <div>
+                        <h3>Live Watchlist</h3>
+                        <p>Be an Arch for others. See the real-time safety status of your friends and family in one centralized place.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Privacy First -->
+            <div class="bento-card reveal reveal-delay-3">
+                <div class="card-glow" style="background: var(--accent-3);"></div>
+                <div class="icon-wrap">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
+                <h3>Privacy First</h3>
+                <p>Your PINs are encrypted. We protect your data as much as we protect you.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="section">
+        <div class="title-group reveal">
+            <div class="title-label">Process</div>
+            <h2>Getting Started</h2>
+            <p>Four simple steps to an automated safety net that works silently in the background.</p>
+        </div>
+        <div class="steps-container">
+            <div class="step reveal">
+                <div class="step-indicator">01</div>
+                <div class="step-content">
+                    <h3>Build Your Net</h3>
+                    <p>Add trusted friends and family to your Arch Network. They're the ones who will be notified if you need help.</p>
+                </div>
+            </div>
+            <div class="step reveal reveal-delay-1">
+                <div class="step-indicator">02</div>
+                <div class="step-content">
+                    <h3>Set Your Timer</h3>
+                    <p>Choose your check-in interval (e.g., every 24 or 36 hours). This is how often you'll need to confirm you're safe.</p>
+                </div>
+            </div>
+            <div class="step reveal reveal-delay-2">
+                <div class="step-indicator">03</div>
+                <div class="step-content">
+                    <h3>Stay Green</h3>
+                    <p>As long as you check in on time, your status stays Halo Green and everyone knows you're safe.</p>
+                </div>
+            </div>
+            <div class="step reveal reveal-delay-3">
+                <div class="step-indicator">04</div>
+                <div class="step-content">
+                    <h3>Automatic Protection</h3>
+                    <p>Miss a check-in? Halo goes into Critical mode. Don't respond? Your Archs get instantly notified.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- Screenshots -->
+    <section id="screenshots" class="section shots-section" style="padding-bottom: 5rem;">
+        <div class="title-group reveal">
+            <div class="title-label">Preview</div>
+            <h2>See Halo In Action</h2>
+            <p>A glimpse into the experience that keeps your inner circle connected.</p>
+        </div>
+        <div class="shots-carousel reveal">
+            <button class="shot-nav shot-nav-prev" onclick="moveShot(-1)" aria-label="Previous screenshot">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <div class="shots-track">
+                <div class="shot-card" data-index="0">
+                    <div class="phone-frame">
+                        <img src="./assets/screenshots/1_Home_Active_Timer.png" alt="Home">
+                    </div>
+                    <h3>Active Shield</h3>
+                    <p>Your safety timer runs in the background. Check in with one tap.</p>
+                </div>
+                <div class="shot-card" data-index="1">
+                    <div class="phone-frame">
+                        <img src="./assets/screenshots/2_Arch_Network.png" alt="Arch Network">
+                    </div>
+                    <h3>Your Inner Circle</h3>
+                    <p>Manage your trusted Archs who form your safety network.</p>
+                </div>
+                <div class="shot-card" data-index="2">
+                    <div class="phone-frame">
+                        <img src="./assets/screenshots/3_Red_Alert_SOS.png" alt="Red Alert">
+                    </div>
+                    <h3>Instant Alerts</h3>
+                    <p>When the timer hits zero, your Archs are notified immediately.</p>
+                </div>
+                <div class="shot-card" data-index="3">
+                    <div class="phone-frame">
+                        <img src="./assets/screenshots/4_Watchlist_View.png" alt="Watchlist">
+                    </div>
+                    <h3>Protect Others</h3>
+                    <p>Monitor the safety status of people who made you their Arch.</p>
+                </div>
+                <div class="shot-card" data-index="4">
+                    <div class="phone-frame">
+                        <img src="./assets/screenshots/5_Safety_Recovery.png" alt="Recovery">
+                    </div>
+                    <h3>You're In Control</h3>
+                    <p>Quickly reassure your network with a message when you're safe.</p>
+                </div>
+            </div>
+            <button class="shot-nav shot-nav-next" onclick="moveShot(1)" aria-label="Next screenshot">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+        </div>
+        <div class="shots-dots">
+            <button class="shots-dot active" data-dot="0" onclick="goToShot(0)"></button>
+            <button class="shots-dot" data-dot="1" onclick="goToShot(1)"></button>
+            <button class="shots-dot" data-dot="2" onclick="goToShot(2)"></button>
+            <button class="shots-dot" data-dot="3" onclick="goToShot(3)"></button>
+            <button class="shots-dot" data-dot="4" onclick="goToShot(4)"></button>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+ <section id="who-its-for" class="section">
+    <div class="title-group reveal">
+        <div class="title-label">Audience</div>
+        <h2>Who Is Halo For?</h2>
+        <p>Built for anyone who values peace of mind, for themselves and the people they love.</p>
+    </div>
+    
+    <div class="audience-grid">
+        <div class="audience-card reveal">
+            <div class="audience-img-wrapper">
+                <img src="./assets/who-its-for/SoloLiving.jpg" alt="Solo Living">
+            </div>
+            <div class="audience-content">
+                <h4>Solo Living</h4>
+                <p>Alert someone if something happens while home alone.</p>
+            </div>
+        </div>
+
+        <div class="audience-card reveal reveal-delay-1">
+            <div class="audience-img-wrapper">
+                <img src="./assets/who-its-for/SoloTravelers.jpg" alt="Solo Travelers">
+            </div>
+            <div class="audience-content">
+                <h4>Solo Travelers</h4>
+                <p>Explore with confidence. Your Archs are always with you.</p>
+            </div>
+        </div>
+
+        <div class="audience-card reveal reveal-delay-2">
+            <div class="audience-img-wrapper">
+                <img src="./assets/who-its-for/Parents_Guardians.jpg" alt="Parents & Guardians">
+            </div>
+            <div class="audience-content">
+                <h4>Parents & Guardians</h4>
+                <p>Give freedom while ensuring safety without constant texts.</p>
+            </div>
+        </div>
+
+        <div class="audience-card reveal reveal-delay-3">
+            <div class="audience-img-wrapper">
+                <img src="./assets/who-its-for/Couples.jpg" alt="Couples">
+            </div>
+            <div class="audience-content">
+                <h4>Couples</h4>
+                <p>Replace "text me when home" with automated peace of mind.</p>
+            </div>
+        </div>
+
+        <div class="audience-card reveal">
+            <div class="audience-img-wrapper">
+                <img src="./assets/who-its-for/Friends.jpg" alt="Friend Groups">
+            </div>
+            <div class="audience-content">
+                <h4>Friend Groups</h4>
+                <p>The ultimate buddy system. Ensure everyone gets home safe.</p>
+            </div>
+        </div>
+
+        <div class="audience-card reveal reveal-delay-1">
+            <div class="audience-img-wrapper">
+                <img src="./assets/who-its-for/ActiveSeniors.jpg" alt="Active Seniors">
+            </div>
+            <div class="audience-content">
+                <h4>Active Seniors</h4>
+                <p>Non-intrusive safety for elderly relatives to stay active.</p>
+            </div>
+        </div>
+
+        <div class="audience-card reveal reveal-delay-2">
+            <div class="audience-img-wrapper">
+                <img src="./assets/who-its-for/Professionals.jpg" alt="Professionals">
+            </div>
+            <div class="audience-content">
+                <h4>Professionals</h4>
+                <p>Perfect for realtors or night-shift workers alone.</p>
+            </div>
+        </div>
+
+        <div class="audience-card reveal reveal-delay-3">
+            <div class="audience-img-wrapper">
+                <img src="./assets/who-its-for/Commuters.jpg" alt="Commuters">
+            </div>
+            <div class="audience-content">
+                <h4>Commuters</h4>
+                <p>Safety during late-night rides or daily travel.</p>
+            </div>
+        </div>
+    </div>
+</section>
+    <div class="section-divider"></div>
+
+    <!-- Waitlist CTA -->
+    <section id="waitlist" class="cta-section">
+        <div class="cta-banner reveal">
+            <h2>Ready to Build Your<br><span style="background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Safety Net?</span></h2>
+            <p>Be the first to know when Halo launches. Join the waitlist and get early access.</p>
+            <form class="waitlist-form cta-waitlist-form" id="ctaWaitlistForm" onsubmit="return handleWaitlist(event, 'cta')">
+                <input type="email" placeholder="Enter your email" required aria-label="Email address">
+                <button type="submit" class="btn btn-primary">Join the Waitlist <span class="btn-arrow">&rarr;</span></button>
+            </form>
+            <div class="waitlist-success" id="ctaWaitlistSuccess">
+                <div class="success-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <h3>You're on the list!</h3>
+                <p>We'll notify you as soon as Halo launches.</p>
+            </div>
+            <p class="waitlist-note" style="margin-top: 1rem;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> No spam, ever. Unsubscribe anytime.</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-inner">
+            <div class="footer-col footer-brand">
+                <a href="#" class="logo">
+                    <img src="./assets/logo/halo_logo.png" alt="Logo">
+                    Halo
+                </a>
+                <p>Your automated safety net. Protection that speaks when you can't.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#how-it-works">How It Works</a></li>
+                    <li><a href="#screenshots">App Preview</a></li>
+                    <li><a href="#who-its-for">Audience</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="./user-guide.html">User Guide & FAQ</a></li>
+                    <li><a href="./support.html">Support</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="./privacy-policy.html">Privacy Policy</a></li>
+                    <li><a href="./terms-of-service.html">Terms of Service</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Halo. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- Scroll Reveal ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // --- Nav scroll effect ---
+        window.addEventListener('scroll', () => {
+            document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+        });
+
+        // --- Mobile menu ---
+        document.getElementById('mobileToggle').addEventListener('click', () => {
+            document.getElementById('navLinks').classList.toggle('open');
+        });
+
+        // --- Close mobile menu on link click ---
+        document.querySelectorAll('#navLinks a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('navLinks').classList.remove('open');
+            });
+        });
+
+        // --- Screenshot Carousel ---
+        let currentShot = 0;
+        const shotCards = document.querySelectorAll('.shot-card');
+        const shotDots = document.querySelectorAll('.shots-dot');
+        let autoPlayTimer;
+
+        function updateCarousel() {
+            shotCards.forEach((card, i) => {
+                card.className = 'shot-card';
+                const diff = i - currentShot;
+                if (diff === 0) card.classList.add('active');
+                else if (diff === -1) card.classList.add('prev');
+                else if (diff === 1) card.classList.add('next');
+                else if (diff === -2) card.classList.add('far-prev');
+                else if (diff === 2) card.classList.add('far-next');
+                else card.classList.add('hidden-card');
+            });
+            shotDots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentShot);
+            });
+        }
+
+        function moveShot(dir) {
+            currentShot = (currentShot + dir + shotCards.length) % shotCards.length;
+            updateCarousel();
+            resetAutoPlay();
+        }
+
+        function goToShot(index) {
+            currentShot = index;
+            updateCarousel();
+            resetAutoPlay();
+        }
+
+        function resetAutoPlay() {
+            clearInterval(autoPlayTimer);
+            autoPlayTimer = setInterval(() => moveShot(1), 4000);
+        }
+
+        // Click on a side card to bring it to center
+        shotCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const idx = parseInt(card.dataset.index);
+                if (idx !== currentShot) {
+                    goToShot(idx);
+                }
+            });
+        });
+
+        // Touch/swipe support for mobile
+        let touchStartX = 0;
+        const carousel = document.querySelector('.shots-carousel');
+        if (carousel) {
+            carousel.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+            carousel.addEventListener('touchend', (e) => {
+                const diff = touchStartX - e.changedTouches[0].screenX;
+                if (Math.abs(diff) > 50) {
+                    moveShot(diff > 0 ? 1 : -1);
+                }
+            }, { passive: true });
+        }
+
+        // Keyboard support
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') moveShot(-1);
+            if (e.key === 'ArrowRight') moveShot(1);
+        });
+
+        // Initialize carousel & auto-play
+        updateCarousel();
+        autoPlayTimer = setInterval(() => moveShot(1), 4000);
+
+        // --- Waitlist Form Handler ---
+        function handleWaitlist(e, source) {
+            e.preventDefault();
+
+            const form = e.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const email = form.querySelector('input[type="email"]').value;
+
+            // Disable button & show loading
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Submitting…';
+
+            // Google Form POST endpoint
+            const GOOGLE_FORM_URL =
+                'https://docs.google.com/forms/d/e/1FAIpQLSeusOrvHTTigF9nQduYTW2A4HodxyD-SCrY-C0sTclqSi-44g/formResponse';
+            const EMAIL_FIELD_ID = 'entry.2073083039';
+
+            const data = new FormData();
+            data.append(EMAIL_FIELD_ID, email);
+
+            fetch(GOOGLE_FORM_URL, {
+                method: 'POST',
+                body: data,
+                mode: 'no-cors'          // Google Forms doesn't return CORS headers; no-cors always resolves
+            }).then(function () {
+                showWaitlistSuccess(source);
+            }).catch(function () {
+                // no-cors fetch won't actually reject, but just in case
+                showWaitlistSuccess(source);
+            });
+
+            return false;
+        }
+
+        function showWaitlistSuccess(source) {
+            // Show success on the submitted form
+            var form = document.getElementById(source + 'WaitlistForm');
+            if (form) form.style.display = 'none';
+            document.getElementById(source + 'WaitlistSuccess').classList.add('show');
+
+            // Sync: also mark the other form as submitted
+            var otherSource = source === 'hero' ? 'cta' : 'hero';
+            var otherForm = document.getElementById(otherSource + 'WaitlistForm');
+            if (otherForm) otherForm.style.display = 'none';
+            var otherSuccess = document.getElementById(otherSource + 'WaitlistSuccess');
+            if (otherSuccess) otherSuccess.classList.add('show');
+        }
+    </script>
+</body>
+</html>
